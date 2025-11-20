@@ -331,4 +331,260 @@
                 </a>
                 <a href="#" class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:border-brandRed hover:shadow-md transition flex flex-col items-center text-center group">
                     <div class="w-12 h-12 bg-red-100 text-red-500 rounded-full flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition">🎥</div>
-         
+                    <span class="font-bold text-sm text-textMain">@proyectosmicropic</span>
+                    <span class="text-xs text-textSub mt-1">YouTube</span>
+                </a>
+                <a href="#" class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:border-brandRed hover:shadow-md transition flex flex-col items-center text-center group">
+                    <div class="w-12 h-12 bg-red-100 text-red-500 rounded-full flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition">🎥</div>
+                    <span class="font-bold text-sm text-textMain">@unlocoysutecnologia</span>
+                    <span class="text-xs text-textSub mt-1">YouTube</span>
+                </a>
+                <a href="#" class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:border-brandRed hover:shadow-md transition flex flex-col items-center text-center group">
+                    <div class="w-12 h-12 bg-red-100 text-red-500 rounded-full flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition">🎥</div>
+                    <span class="font-bold text-sm text-textMain">@HomeAssistantFacil</span>
+                    <span class="text-xs text-textSub mt-1">YouTube</span>
+                </a>
+                <a href="#" class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:border-brandRed hover:shadow-md transition flex flex-col items-center text-center group">
+                    <div class="w-12 h-12 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition">💻</div>
+                    <span class="font-bold text-sm text-textMain">@MiguelAngelLV</span>
+                    <span class="text-xs text-textSub mt-1">GitHub</span>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-textSub text-sm">
+            <p class="mb-2">Desarrollado por <strong>stoker2010</strong> para la comunidad de Home Assistant.</p>
+            <p>Compatible con HA 2024.x+. Licencia MIT.</p>
+        </div>
+    </footer>
+
+    <!-- Logic & Data -->
+    <script>
+        // --- Navigation Logic ---
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function setInstallStep(index) {
+            const contents = document.querySelectorAll('.install-content');
+            const tabs = document.querySelectorAll('.install-tab');
+            
+            contents.forEach((el, i) => {
+                if(i === index) el.classList.remove('hidden');
+                else el.classList.add('hidden');
+            });
+
+            tabs.forEach((el, i) => {
+                if(i === index) {
+                    el.classList.add('border-brandBlue', 'text-brandBlue', 'bg-blue-50');
+                    el.classList.remove('border-transparent', 'text-textSub');
+                } else {
+                    el.classList.remove('border-brandBlue', 'text-brandBlue', 'bg-blue-50');
+                    el.classList.add('border-transparent', 'text-textSub');
+                }
+            });
+        }
+
+        // --- Chart 1: Tariff Distribution (Logic Simulator) ---
+        const ctxTariff = document.getElementById('tariffChart').getContext('2d');
+        const tariffDataWeekday = { labels: ['P1 (Punta)', 'P2 (Llano)', 'P3 (Valle)'], data: [35, 25, 40] }; // Mock percentages
+        const tariffDataWeekend = { labels: ['P1 (Punta)', 'P2 (Llano)', 'P3 (Valle)'], data: [0, 0, 100] }; // All P3
+
+        let tariffChart = new Chart(ctxTariff, {
+            type: 'doughnut',
+            data: {
+                labels: tariffDataWeekday.labels,
+                datasets: [{
+                    data: tariffDataWeekday.data,
+                    backgroundColor: ['#f56565', '#ed8936', '#48bb78'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.raw + '% de horas';
+                            }
+                        }
+                    }
+                },
+                cutout: '60%'
+            }
+        });
+
+        function updateTariffChart(mode) {
+            const btnWeekday = document.getElementById('btn-weekday');
+            const btnWeekend = document.getElementById('btn-weekend');
+            const list = document.getElementById('tariff-status-list');
+
+            if(mode === 'weekend') {
+                tariffChart.data.datasets[0].data = tariffDataWeekend.data;
+                btnWeekend.classList.add('ring-2', 'ring-brandBlue', 'bg-blue-50');
+                btnWeekday.classList.remove('ring-2', 'ring-brandBlue', 'bg-blue-50');
+                
+                list.innerHTML = `
+                    <li class="flex justify-between"><span>Periodo Activo:</span> <span class="font-mono font-bold text-brandGreen">P3 (Valle)</span></li>
+                    <li class="flex justify-between"><span>Coste Estimado:</span> <span class="font-mono font-bold text-brandGreen">Mínimo</span></li>
+                    <li class="flex justify-between"><span>Festivo Detectado:</span> <span class="font-mono font-bold text-brandBlue">Sí (24h P3)</span></li>
+                `;
+            } else {
+                tariffChart.data.datasets[0].data = tariffDataWeekday.data;
+                btnWeekday.classList.add('ring-2', 'ring-brandBlue', 'bg-blue-50');
+                btnWeekend.classList.remove('ring-2', 'ring-brandBlue', 'bg-blue-50');
+
+                list.innerHTML = `
+                    <li class="flex justify-between"><span>Periodo Activo:</span> <span class="font-mono font-bold text-brandRed">P1 (Punta)</span></li>
+                    <li class="flex justify-between"><span>Coste Estimado:</span> <span class="font-mono font-bold text-brandRed">Alto</span></li>
+                    <li class="flex justify-between"><span>Festivo Detectado:</span> <span class="font-mono font-bold text-textSub">No</span></li>
+                `;
+            }
+            tariffChart.update();
+        }
+
+        // --- Chart 2: Water Heater Logic (Physics Simulation) ---
+        const ctxHeater = document.getElementById('heaterChart').getContext('2d');
+        
+        // Generate initial "stable" data
+        const initialTimeLabels = Array.from({length: 20}, (_, i) => i);
+        const initialTemps = Array(20).fill(50); // Start at 50C
+        
+        let heaterState = {
+            currentTemp: 50.0,
+            targetTemp: 65.0,
+            isBoost: false,
+            isShower: false,
+            history: [...initialTemps]
+        };
+
+        let heaterChart = new Chart(ctxHeater, {
+            type: 'line',
+            data: {
+                labels: initialTimeLabels,
+                datasets: [{
+                    label: 'Temperatura Agua (°C)',
+                    data: heaterState.history,
+                    borderColor: '#ed8936',
+                    backgroundColor: 'rgba(237, 137, 54, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                },
+                {
+                    label: 'Objetivo',
+                    data: Array(20).fill(65),
+                    borderColor: '#cbd5e0',
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    borderWidth: 1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { 
+                        min: 20, 
+                        max: 80,
+                        title: { display: true, text: '°C' }
+                    },
+                    x: { display: false }
+                },
+                animation: { duration: 0 } 
+            }
+        });
+
+        // Simulation Loop
+        function updateHeaterSimulation() {
+            let change = 0;
+
+            if (heaterState.isShower) {
+                change = -2.5; // Fast drop
+            } else if (heaterState.isBoost) {
+                if (heaterState.currentTemp < heaterState.targetTemp) {
+                    change = 1.5; // Fast heating
+                } else {
+                    heaterState.isBoost = false; // Stop boosting if reached target
+                    document.getElementById('boostBtn').innerText = "⏱️ Activar Boost (30m)";
+                    document.getElementById('boostBtn').classList.remove('ring-4', 'ring-orange-200');
+                }
+            } else {
+                // Natural cooling (loss)
+                change = -0.05; 
+            }
+
+            heaterState.currentTemp += change;
+            // Clamp temp
+            if(heaterState.currentTemp < 20) heaterState.currentTemp = 20;
+            if(heaterState.currentTemp > 80) heaterState.currentTemp = 80;
+
+            // Update Chart Data
+            heaterState.history.shift();
+            heaterState.history.push(heaterState.currentTemp);
+            heaterChart.data.datasets[0].data = heaterState.history;
+            heaterChart.update();
+
+            // Update Displays
+            document.getElementById('currentTempDisplay').innerText = heaterState.currentTemp.toFixed(1) + "°C";
+            
+            // Calculate "Derivative" (Rate of change per hour simulation)
+            // Simulating that 1 "tick" is roughly 1 minute for visual purposes
+            let derivative = change * 60; 
+            let derivDisplay = document.getElementById('derivativeDisplay');
+            let derivExpl = document.getElementById('derivativeExplanation');
+
+            derivDisplay.innerText = derivative.toFixed(1) + " °C/h";
+
+            if(derivative < -20) {
+                derivDisplay.className = "text-2xl font-mono font-bold text-brandRed";
+                derivExpl.innerText = "📉 Ducha detectada (Bajada rápida)";
+            } else if (derivative > 10) {
+                derivDisplay.className = "text-2xl font-mono font-bold text-brandGreen";
+                derivExpl.innerText = "🔥 Calentando (Boost/Solar)";
+            } else {
+                derivDisplay.className = "text-2xl font-mono font-bold text-textSub";
+                derivExpl.innerText = "❄️ Pérdida estática (Aislamiento)";
+            }
+        }
+
+        // Start Simulation Loop
+        setInterval(updateHeaterSimulation, 500); // Update every 500ms
+
+        // Interaction Functions
+        function triggerBoost() {
+            heaterState.isBoost = !heaterState.isBoost;
+            heaterState.isShower = false; // Cancel shower if boosting
+            const btn = document.getElementById('boostBtn');
+            
+            if(heaterState.isBoost) {
+                btn.innerText = "🛑 Detener Boost";
+                btn.classList.add('ring-4', 'ring-orange-200');
+            } else {
+                btn.innerText = "⏱️ Activar Boost (30m)";
+                btn.classList.remove('ring-4', 'ring-orange-200');
+            }
+        }
+
+        function triggerShower() {
+            heaterState.isShower = true;
+            heaterState.isBoost = false;
+            // Shower lasts for 3 seconds of simulation then stops
+            setTimeout(() => { heaterState.isShower = false; }, 3000);
+        }
+
+        // Initialize logic
+        updateTariffChart('weekday');
+
+    </script>
+</body>
+</html>
